@@ -12,7 +12,10 @@ def radius_squared(planet1: Planet, planet2: Planet, frame: int = -1) -> float:
 
 
 def force_value(planet1: Planet, planet2: Planet):
-    return G * planet1.m * planet2.m / radius_squared(planet1, planet2)
+    result = G * planet1.m * planet2.m / radius_squared(planet1, planet2)
+    if result > 500:
+        return 500
+    return result
 
 
 def d_y(planet1: Planet, planet2: Planet, frame=-1):
