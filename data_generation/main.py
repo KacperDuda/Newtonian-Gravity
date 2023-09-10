@@ -4,14 +4,16 @@ import simulator
 import math
 import matplotlib.pyplot as plt
 import json
+import converter
 
 G = 6.31654418845696  # gravity constant in our model
 computational_delta = 0.00001  # amount of time between frames in seconds
-timeToSimulate = 3  # in seconds
+timeToSimulate = 50  # in seconds
 show_delta = 0.01  # showing how often user should have data
+round_to = 5
 
 to_plot = True
-filename = "4-body-disaster"
+filename = "tests"
 
 
 def main():
