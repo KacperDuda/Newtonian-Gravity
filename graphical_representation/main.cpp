@@ -8,13 +8,13 @@
 #include <nlohmann/json.hpp>
 
 int main() {
-    srand(time(NULL));
+    srand(time(NULL)); //needed for generating "stars" in backgroung
 
     std::ifstream file("3.0k_madnessConverted.json");
     if (!file.is_open()) {
         std::cerr << "Failed to open .json file" << std::endl;
         return 1;
-    }
+    }//opening file with needed data
 
     nlohmann::json examplesData;
     file >> examplesData;
@@ -22,28 +22,25 @@ int main() {
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
         return EXIT_FAILURE;
-    }
+    }//loading font for displaying texts
 
     sf::RenderWindow window(sf::VideoMode(800, 800), "Graphic Representation of Problems");
 
     int totalIterations = examplesData["iterations_amount"];
     int currentIteration = 0;
-
     const int nStars = 100;
     std::vector<sf::CircleShape> stars(nStars);
-
     for (int i = 0; i < nStars; i++) {
         sf::CircleShape star(1);
         star.setFillColor(sf::Color::White);
         star.setPosition(rand() % 800, rand() % 800);
         stars[i] = star;
-    }
+    }//all of this sequence creates tiny spots in the background - "stars"
 
     while (currentIteration < totalIterations) {
         const auto& example = examplesData["iterations"][currentIteration];
         int amount = example["amount"];
         int frames = example["frames"];
-
         std::vector<sf::CircleShape> planets(amount);
         std::vector<float> mass;
         std::vector<std::vector<sf::Vector2f>> positions;
@@ -59,15 +56,15 @@ int main() {
                 positions_tmp.emplace_back(x, y);
             }
             positions.push_back(positions_tmp);
-        }
+        }//we write the positions for each planet here
 
         sf::Clock clock;
         float updateTime = example["delta"];
         float elapsedTime = 0.0f;
-        int currentFrame = 0;
+        int currentFrame = 0;//the part where all of needed parameters for animation are defined
 
         bool nextIteration = false;
-        bool previousIteration = false;
+        bool previousIteration = false;//parameters needed for navigating between iterations
 
         while (window.isOpen()) {
             sf::Event event;
@@ -77,22 +74,21 @@ int main() {
                 }
                 if (event.type == sf::Event::KeyPressed) {
                     if (event.key.code == sf::Keyboard::Right) {
-                        nextIteration = true;
+                        nextIteration = true; //right arrow pressed -> next iteration
                     }
                     else if (event.key.code == sf::Keyboard::Left) {
-                        previousIteration = true;
+                        previousIteration = true; //left arrow pressed -> previous iteration
                     }
                 }
             }
-
             window.clear();
 
             for (const auto& star : stars) {
-                window.draw(star);
+                window.draw(star);//drawing of stars
             }
 
             for (int i = 0; i < amount; i++) {
-                float radius = 25.0f * mass[i];
+                float radius = 25.0f * mass[i]; //setting radius linked to mass of the object
                 planets[i].setRadius(radius);
                 if (mass[i] <= 0.2) {
                     planets[i].setFillColor(sf::Color::Yellow);
@@ -105,18 +101,16 @@ int main() {
                 }
                 else {
                     planets[i].setFillColor(sf::Color::Blue);
-                }
+                } // setting colour linked with size of the planet - for better visuality
                 
-
                 double x_new = 0.0, y_new = 0.0;
-
                 if (i < positions.size() && !positions[i].empty()) {
                     if (currentFrame < positions[i].size()) {
                         x_new = (positions[i][currentFrame].x + 2.5) * (800.0 / 5.0);
                         y_new = (positions[i][currentFrame].y + 2.5) * (800.0 / 5.0);
                     }
                 }
-                planets[i].setPosition(x_new, y_new);
+                planets[i].setPosition(x_new, y_new);//setting the position for planet - from previously loaded file
 
                 window.draw(planets[i]);
             }
@@ -131,7 +125,7 @@ int main() {
                 massString << "Mass: " << mass[i];
                 texts[i].setString(massString.str());
                 texts[i].setPosition(planets[i].getPosition().x + 30, planets[i].getPosition().y - 30);
-                window.draw(texts[i]);
+                window.draw(texts[i]);//displaying masses of the planets near them
             }
 
             sf::Text iterationText, instructionText;
@@ -140,19 +134,19 @@ int main() {
             iterationText.setFillColor(sf::Color::White);
             iterationText.setPosition(700, 10);
             iterationText.setString("Iteration: " + std::to_string(currentIteration + 1));
-            window.draw(iterationText);
+            window.draw(iterationText);//info about iteration we are currently in - top right corner
 
             instructionText.setFont(font);
             instructionText.setCharacterSize(15);
             instructionText.setFillColor(sf::Color::White);
             instructionText.setPosition(10, 10);
             instructionText.setString("In order to change iteration to the next one, press ->,\nif you want to see the previous iteration, press <-.");
-            window.draw(instructionText);
+            window.draw(instructionText);//info about how to navigate between iterations
 
             window.display();
 
             sf::Time frameTime = sf::seconds(updateTime);
-            sf::sleep(frameTime); // Czekamy na czas aktualizacji klatki
+            sf::sleep(frameTime); //frame update
 
             if (nextIteration) {
                 currentIteration = (currentIteration + 1) % totalIterations;
@@ -161,15 +155,14 @@ int main() {
             else if (previousIteration) {
                 currentIteration = (currentIteration - 1 + totalIterations) % totalIterations;
                 break;
-            }
+            }//changing of interation - based on if we pressed any button
 
-            currentFrame++;
+            currentFrame++;//implementing frame to display a new position of object
 
             if (currentFrame >= frames) {
-                break; // Zamykamy okno po zakończeniu animacji danej iteracji
+                break;
             }
         }
     }
-
     return 0;
 }
