@@ -2,7 +2,12 @@ from planet import *
 from simulator import next_frame
 import json
 import numpy as np
-from main import computational_delta, round_to
+from constants import computational_delta, round_to
+from multiprocessing import Pool, Value
+
+total_iter = Value('i', 0)
+finished_iter = Value('i', 0)
+
 
 # mathematically returning value that will make weighted average to be equal zero
 def calc_last_value(masses, coords):
@@ -67,38 +72,51 @@ def gen_planets(planet_amount):
     return planets
 
 
-def gen_iteration(planet_amount, output_frames, delta):
-    planets = gen_planets(planet_amount)
+def gen_iteration(planet_amount, output_frames, delta, pla=False, show_progress=False):
+    global finished_iter, total_iter
 
-    for i in range(int((output_frames+1) * delta / computational_delta)):
+    if pla:
+        planets = pla
+    else:
+        planets = gen_planets(planet_amount)
+
+    for i in range(int((output_frames + 1) * delta / computational_delta)):
         next_frame(planets, computational_delta)
 
     # check for anomalies and start process over if so
     X = []
     Y = []
 
-    X.append(delta) # adding time to the model
+    X.append(delta)  # adding time to the model
     # adding masses of planets - order of neurons does not matter
     for planet in planets:
         X.append(round(planet.m, round_to))
 
-    for i in range(int((output_frames+1) * delta / computational_delta)+1):
+    for i in range(int((output_frames + 1) * delta / computational_delta) + 1):
         if i % int(delta / computational_delta) == 0:
             frame = []
             for planet in planets:
                 frame.append(round(planet.positions[i].x, round_to))
                 frame.append(round(planet.positions[i].y, round_to))
 
-            if int(i/int(delta / computational_delta)) < 2:
+            if int(i / int(delta / computational_delta)) < 2:
                 X += frame
             else:
                 Y += frame
 
+    if show_progress:
+        finished_iter.value += 1
+        print(
+            f"{finished_iter.value + 1}/{total_iter.value}, {100 * finished_iter.value / total_iter.value:.1f}%")  # adding info about each iteration
 
     return X, Y
 
+
 # generating a give amount of iteration for machine learning and saves it inside files
-def generate(planet_amount: int, iterations: int, output_frames: int, delta, filename: str) -> None:
+def generate(planet_amount: int, iterations: int, output_frames: int, delta, filename: str, show_progress=True) -> None:
+    global total_iter, finished_iter
+    total_iter.value = iterations
+    finished_iter.value = 0
     print("Generating")
     data = {
         "planet_amount": planet_amount,
@@ -108,14 +126,26 @@ def generate(planet_amount: int, iterations: int, output_frames: int, delta, fil
         "y": []
     }
 
-    for i in range(iterations):
-        (to_X, to_y) = gen_iteration(planet_amount, output_frames, delta)
-        data["X"].append(to_X)
-        data["y"].append(to_y)
-        print(f"{i + 1}/{iterations}, {100 * (i + 1) / iterations:.1f}%")  # adding info about each iteration
+    # MULTI THREAD
+    p = Pool()
+    tuples = p.starmap(gen_iteration, [
+        (planet_amount, output_frames, delta, False, show_progress) for i in range(iterations)
+    ])
+    p.close()
+    p.join()
 
-    with open(f'../data/{filename}.json', 'w') as output:
-        json.dump(data, output)
+    for t in tuples:
+        data["X"].append(t[0])
+        data["y"].append(t[1])
+
+    # SINGLE THREAD
+    # for i in range(iterations):
+    #     (to_X, to_y) = gen_iteration(planet_amount, output_frames, delta)
+    #     data["X"].append(to_X)
+    #     data["y"].append(to_y)
+    #     print(f"{i + 1}/{iterations}, {100 * (i + 1) / iterations:.1f}%")  # adding info about each iteration
+
+    return data
 
 
 if __name__ == '__main__':
@@ -126,5 +156,5 @@ if __name__ == '__main__':
     delta /= 1000
     filename = input("filename: ") or 'test'
 
-    generate(p_amount, iter, frames, delta, filename)
-    # generate(2, 1, 300, 0.1, 'best')
+    with open(f'../data/{filename}.json', 'w') as output:
+        json.dump(generate(p_amount, iter, frames, delta, filename), output)
