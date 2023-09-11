@@ -8,7 +8,7 @@
 #include <nlohmann/json.hpp>
 
 int main() {
-    srand(time(NULL)); //needed for generating "stars" in backgroung
+    srand(time(NULL)); //needed for generating "stars" in background
 
     std::ifstream file("3.0k_madnessConverted.json");
     if (!file.is_open()) {
