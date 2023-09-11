@@ -1,5 +1,5 @@
 from planet import Planet
-from main import G
+from constants import G
 from typing import List
 import math
 
@@ -13,6 +13,7 @@ def radius_squared(planet1: Planet, planet2: Planet, frame: int = -1) -> float:
 
 def force_value(planet1: Planet, planet2: Planet):
     result = G * planet1.m * planet2.m / radius_squared(planet1, planet2)
+    # result = G * planet1.m * planet2.m * math.sqrt(radius_squared(planet1, planet2))
     if result > 500:
         return 500
     return result
