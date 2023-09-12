@@ -1,30 +1,32 @@
+import json
 
-import tensorflow
-from tensorflow.keras.models import Sequential # no feedback loop
-from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1' # 0 - all messages, 1 - no INFO, 2 - no warning, 3 - no error reporting
 
-# nothing is ready
-# print("Num GPUs Available: ", len(tensorflow.config.experimental.list_physical_devices('GPU'))
+import tensorrt
+import tensorflow as tf
 
-#loading data
-#(X_train, y_train), (X_valid, y_valid) =
+print("Number of GPUs to use: ", len(tf.config.experimental.list_physical_devices('GPU')))
 
-
-model = Sequential()
-
-model.add(Dense(32, input_dim=13, activation='relu'))
-# model.add(BatchNormalization())
-
-model.add(Dense(32, activation='relu'))
-# model.add(BatchNormalization())
-model.add(Dropout(0.1))
-
-model.add(Dense(16, activation='relu'))
-# model.add(BatchNormalization())
-model.add(Dropout(0.1))
-
-model.summary()
-
-#model.compile(loss = ??, optimizer = ??, metrics= ??)
-
-#model.fit(X_train, y_train, batch_size = 128, epoch = 10, verbose = 1, validation_data = (X_valid, y_valid))
+# # impoerting data
+# with open("../data/3.0k_madness.json") as trainingSet:
+#     data_train = json.load(trainingSet)
+#     X = data_train["X"]
+#     Y = data_train["y"]
+#     print("Data loaded successfully")
+#
+# with tf.device():
+#     model = Sequential()
+#
+#     model.add(Dense(32, input_dim=13, activation='relu'))
+#     # model.add(BatchNormalization())
+#
+#     model.add(Dense(32, activation='relu'))
+#     # model.add(BatchNormalization())
+#     model.add(Dropout(0.1))
+#
+#     model.add(Dense(16, activation='relu'))
+#     # model.add(BatchNormalization())
+#     model.add(Dropout(0.1))
+#
+#     model.summary()
