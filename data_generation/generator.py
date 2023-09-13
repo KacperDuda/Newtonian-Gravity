@@ -107,7 +107,7 @@ def gen_iteration(planet_amount, output_frames, delta, pla=False, show_progress=
     if show_progress:
         finished_iter.value += 1
         print(
-            f"{finished_iter.value + 1}/{total_iter.value}, {100 * finished_iter.value / total_iter.value:.1f}%")  # adding info about each iteration
+            f"{finished_iter.value}/{total_iter.value}, {100 * finished_iter.value / total_iter.value:.1f}%")  # adding info about each iteration
 
     return X, Y
 
@@ -156,5 +156,7 @@ if __name__ == '__main__':
     delta /= 1000
     filename = input("filename: ") or 'test'
 
+    data = generate(p_amount, iter, frames, delta, filename)
+
     with open(f'../data/{filename}.json', 'w') as output:
-        json.dump(generate(p_amount, iter, frames, delta, filename), output)
+        json.dump(data, output)
