@@ -2,7 +2,7 @@ import json
 import numpy as np
 from planet import Planet, Position
 
-filenameIn = '2k80ms2s'
+filenameIn = 'experiment_one/10k80ms2s'
 filenameOut = filenameIn + 'Converted'
 
 
@@ -39,6 +39,7 @@ def get_iterations(data):
 
             iterations[i]["planets"].append(planet.toDict())
             planets.append(planet)
+
 
     counter = 0
     to_big = 0
