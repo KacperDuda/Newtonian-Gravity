@@ -80,7 +80,7 @@ def gen_iteration(planet_amount, output_frames, delta, pla=False, show_progress=
     else:
         planets = gen_planets(planet_amount)
 
-    for i in range(int((output_frames + 1) * delta / computational_delta)):
+    for i in range(int((output_frames + 2) * delta / computational_delta)):
         next_frame(planets, computational_delta)
 
     # check for anomalies and start process over if so
@@ -92,7 +92,7 @@ def gen_iteration(planet_amount, output_frames, delta, pla=False, show_progress=
     for planet in planets:
         X.append(round(planet.m, round_to))
 
-    for i in range(int((output_frames + 1) * delta / computational_delta) + 1):
+    for i in range(int((output_frames + 1) * delta / computational_delta) + 2):
         if i % int(delta / computational_delta) == 0:
             frame = []
             for planet in planets:
@@ -107,13 +107,13 @@ def gen_iteration(planet_amount, output_frames, delta, pla=False, show_progress=
     if show_progress:
         finished_iter.value += 1
         print(
-            f"{finished_iter.value}/{total_iter.value}, {100 * finished_iter.value / total_iter.value:.1f}%")  # adding info about each iteration
+            f"{finished_iter.value} / {total_iter.value}, {100 * finished_iter.value / total_iter.value:.1f}%")  # adding info about each iteration
 
     return X, Y
 
 
 # generating a give amount of iteration for machine learning and saves it inside files
-def generate(planet_amount: int, iterations: int, output_frames: int, delta, filename: str, show_progress=True) -> None:
+def generate(planet_amount: int, iterations: int, output_frames: int, delta, filename: str = "", show_progress=True) -> None:
     global total_iter, finished_iter
     total_iter.value = iterations
     finished_iter.value = 0
@@ -154,9 +154,8 @@ if __name__ == '__main__':
     frames = int(input("Output frames per iteration: ") or 20)
     delta = int(input("Time (in ms) between all frames: ") or 100)
     delta /= 1000
-    filename = input("filename: ") or 'test'
 
-    data = generate(p_amount, iter, frames, delta, filename)
+    data = generate(p_amount, iter, frames, delta)
 
-    with open(f'../data/{filename}.json', 'w') as output:
+    with open(f'../data/{p_amount}p{iter}i{frames}f{delta*1000}d.json', 'w') as output:
         json.dump(data, output)
