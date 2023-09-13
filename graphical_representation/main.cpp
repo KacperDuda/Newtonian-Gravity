@@ -8,7 +8,7 @@
 #include <nlohmann/json.hpp>
 
 int main() {
-    srand(time(NULL)); //needed for generating "stars" in background - they are genereted in the random places
+    srand(time(NULL)); //needed for generating "stars" in background - they are generated in the random places
 
     std::ifstream file("10k80ms2s-trimed.json");
     if (!file.is_open()) {
