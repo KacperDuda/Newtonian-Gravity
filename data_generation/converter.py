@@ -1,7 +1,8 @@
 import json
+import numpy as np
 from planet import Planet, Position
 
-filenameIn = 'proportionalGravity'
+filenameIn = 'experiment_one/10k80ms2s'
 filenameOut = filenameIn + 'Converted'
 
 
@@ -9,6 +10,8 @@ def get_iterations(data):
     planet_amount = data["planet_amount"]
     iterations_amount = data["iterations"]
     output_frames = data["output_frames_amount"]
+
+    planets = []
 
     iterations = []
     for i in range(iterations_amount):
@@ -35,6 +38,28 @@ def get_iterations(data):
                 ))
 
             iterations[i]["planets"].append(planet.toDict())
+            planets.append(planet)
+
+
+    counter = 0
+    to_big = 0
+    biggest = 0
+    for planet in planets:
+        for position in planet.positions:
+            counter += 2
+            if abs(position.x) > 10:
+                to_big += 1
+            if abs(position.y) > 10:
+                to_big += 1
+
+            if abs(position.x) > biggest:
+                biggest = abs(position.x)
+            if abs(position.y) > biggest:
+                biggest = abs(position.y)
+
+    # print(to_big, counter, to_big/counter, biggest)
+    print(f"Positions bigger than 10: {to_big} of {counter}, {round(100*to_big/counter, 2)}%")
+    print(f"Biggest coordinate (absolute value): {biggest}")
 
     return {
         "iterations_amount": iterations_amount,
