@@ -19,6 +19,7 @@ int main() {
     nlohmann::json examplesData;
     file >> examplesData;//writing data into variable
 
+
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
         return EXIT_FAILURE;
@@ -42,6 +43,7 @@ int main() {
         const auto& example = examplesData["iterations"][currentIteration];
         int amount = example["amount"];
         int frames = example["frames"];
+      
         std::vector<sf::CircleShape> planets_model(amount);
         std::vector<float> mass; //same for model planets and given ones
         std::vector<std::vector<sf::Vector2f>> positions_model; //positions of model planets
@@ -49,6 +51,7 @@ int main() {
         const auto& examples_2 = examplesData["iterations"][currentIteration + 1];
         std::vector<sf::CircleShape> planets_true(amount);
         std::vector<std::vector<sf::Vector2f>> positions_true;//inforamtion about the right positions of planets
+
 
         for (const auto& planetData : example["planets"]) {
             float mass_tmp = planetData["mass"];
@@ -72,6 +75,7 @@ int main() {
             }
             positions_true.push_back(positions_true_tmp);
         }//we write the right position for every planet
+
 
         sf::Clock clock;
         float updateTime = example["delta"];
@@ -99,11 +103,14 @@ int main() {
             window.clear();
 
             for (const auto& star : stars) {
+
                 window.draw(star);//drawings stars
+
             }
 
             for (int i = 0; i < amount; i++) {
                 float radius = 25.0f * mass[i]; //setting radius linked to mass of the object
+              
                 planets_model[i].setRadius(radius);
                 if (mass[i] <= 0.2) {
                     planets_model[i].setFillColor(sf::Color::Yellow);
@@ -146,17 +153,21 @@ int main() {
 
                 window.draw(planets_true[i]);
                 window.draw(planets_model[i]);
+                indow.draw(planets[i]);
             }
 
             std::vector<sf::Text> texts(amount);
             for (int i = 0; i < amount; i++) {
                 texts[i].setFont(font);
+              
                 texts[i].setCharacterSize(12);
+
                 texts[i].setFillColor(sf::Color::White);
 
                 std::ostringstream massString;
                 massString << "Mass: " << mass[i];
                 texts[i].setString(massString.str());
+              
                 texts[i].setPosition(planets_model[i].getPosition().x + 20, planets_model[i].getPosition().y - 20);
                 window.draw(texts[i]);//displaying masses of the planets near them
             }
