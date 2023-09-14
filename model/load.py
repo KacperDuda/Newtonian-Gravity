@@ -17,7 +17,7 @@ BatchNormalization = tf.keras.layers.BatchNormalization
 load = tf.keras.models.load_model
 
 
-filename = "experiment_one/10k80ms2s"
+filename = "experiment_one/3p1000i80f25.0d"
 
 with open(f"../data/{filename}.json") as f:
     data = json.load(f)
@@ -25,7 +25,7 @@ with open(f"../data/{filename}.json") as f:
 X = np.array(data["X"])
 Y_numerical = np.array(data["y"])
 
-model = load('../model_data/09.13.18.50/0.h5')
+model = load('../model_data/09.13.20.11/19.h5')
 Y_predicted = model.predict(X)
 
 X_final = []
