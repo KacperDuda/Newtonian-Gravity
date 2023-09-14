@@ -62,20 +62,24 @@ else:
 
     model.add(Dense(500, activation="relu"))
     model.add(Dropout(0.25))
+    model.add(BatchNormalization())
 
     model.add(Dense(500, activation="relu"))
     model.add(Dropout(0.35))
+    model.add(BatchNormalization())
 
     model.add(Dense(500, activation="relu"))
     model.add(Dropout(0.25))
+    model.add(BatchNormalization())
 
     model.add(Dense(750, activation="relu"))
     model.add(Dropout(0.2))
+    model.add(BatchNormalization())
 
     model.add(Dense(480, activation="linear"))
 
     model.summary()
-    model.compile(optimizer="adam", loss="mean_squared_error")
+    model.compile(optimizer=tf.keras.optimizers.Adam(), loss="mean_squared_error")
 newSection()
 
 # TRAINING
